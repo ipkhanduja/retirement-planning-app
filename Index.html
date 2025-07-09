@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetirePlan - Your Retirement Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #f8fafc;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px 8px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .app-content {
+            height: calc(100% - 120px);
+            overflow-y: auto;
+            padding: 0 20px;
+            background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .header {
+            padding: 20px 0;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0 -20px 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.1; }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .progress-ring:hover {
+            transform: scale(1.05);
+        }
+
+        .progress-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.2);
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: #10b981;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 314;
+            stroke-dashoffset: 188;
+            animation: progressAnimation 2s ease-out;
+        }
+
+        @keyframes progressAnimation {
+            from { stroke-dashoffset: 314; }
+            to { stroke-dashoffset: 188; }
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        .progress-percent {
+            font-size: 24px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .action-btn:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .milestone-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .milestone-item:last-child {
+            border-bottom: none;
+        }
+
+        .milestone-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .milestone-check.pending {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .milestone-text {
+            flex: 1;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        .milestone-amount {
+            font-size: 14px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            max-width: 359px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #64748b;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tips-section {
+            background: linear-gradient(135deg, #fef3c7, #fbbf24);
+            color: #92400e;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .tips-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tips-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 24px;
+            border: none;
+            z-index: 100;
+        }
+
+        .floating-action:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.6);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        @media (max-width: 400px) {
+            .phone-container {
+                width: 100%;
+                height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                padding: 0;
+            }
+            
+            .screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41 AM</span>
+                <span>RetirePlan</span>
+                <span>100%</span>
+            </div>
+            
+            <div class="app-content">
+                <div class="header">
+                    <h1>Your Retirement Journey</h1>
+                    <p>Building your future, one step at a time</p>
+                    
+                    <div class="progress-ring" onclick="showProgressDetails()">
+                        <svg>
+                            <circle class="progress-ring-bg" cx="60" cy="60" r="50"></circle>
+                            <circle class="progress-ring-fill" cx="60" cy="60" r="50"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <span class="progress-percent">40%</span>
+                            <span class="progress-label">Complete</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tips-section">
+                    <div class="tips-title">💡 Today's Tip</div>
+                    <div class="tips-text">Increasing your 401(k) contribution by just 1% can significantly boost your retirement savings over time!</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💰</div>
+                        <div class="card-title">Current Savings</div>
+                    </div>
+                    <div class="card-value">$245,680</div>
+                    <div class="card-subtitle">+$2,340 this month</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🎯</div>
+                        <div class="card-title">Retirement Goal</div>
+                    </div>
+                    <div class="card-value">$1,200,000</div>
+                    <div class="card-subtitle">Target by age 65</div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="addContribution()">
+                        <span>Add Contribution</span>
+                    </button>
+                    <button class="action-btn" onclick="viewProjections()">
+                        <span>View Projections</span>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">📊</div>
+                        <div class="card-title">Monthly Contribution</div>
+                    </div>
+                    <div class="card-value">$1,250</div>
+                    <div class="card-subtitle">15% of salary</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏆</div>
+                        <div class="card-title">Milestones</div>
+                    </div>
+                    
+                    <div class="milestone-item">
+                        <div class="milestone-check">✓</div>
+                        <div class="milestone-text">First $10,000 saved</div>
+                        <div class="milestone-amount">Completed</div>
+                    </div>
+                    
+                    <div class="milestone-item">
+                        <div class="milestone-check">✓</div>
+                        <div class="milestone-text">Maxed out employer match</div>
+                        <div class="milestone-amount">Completed</div>
+                    </div>
+                    
+                    <div class="milestone-item">
+                        <div class="milestone-check pending">○</div>
+                        <div class="milestone-text">Save $500,000</div>
+                        <div class="milestone-amount">$254,320 to go</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">⏰</div>
+                        <div class="card-title">Time to Retirement</div>
+                    </div>
+                    <div class="card-value">22 years</div>
+                    <div class="card-subtitle">At current savings rate</div>
+                </div>
+
+                <div style="height: 120px;"></div>
+            </div>
+
+            <button class="floating-action" onclick="openCalculator()">
+                <span>+</span>
+                <div class="notification-dot"></div>
+            </button>
+            
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="switchTab('dashboard')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Dashboard</div>
+                </div>
+                <div class="nav-item" onclick="switchTab('goals')">
+                    <div class="nav-icon">🎯</div>
+                    <div class="nav-label">Goals</div>
+                </div>
+                <div class="nav-item" onclick="switchTab('insights')">
+                    <div class="nav-icon">📈</div>
+                    <div class="nav-label">Insights</div>
+                </div>
+                <div class="nav-item" onclick="switchTab('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showProgressDetails() {
+            alert("Progress Details:\n\n• Emergency Fund: Complete ✓\n• 401(k) Setup: Complete ✓\n• Investment Strategy: In Progress\n• Estate Planning: Pending");
+        }
+
+        function addContribution() {
+            const amount = prompt("Enter additional contribution amount:");
+            if (amount) {
+                alert(`Great! Added $${amount} to your retirement savings.`);
+            }
+        }
+
+        function viewProjections() {
+            alert("Projections:\n\n• Age 50: $456,000\n• Age 60: $782,000\n• Age 65: $1,200,000\n\nBased on current savings rate and 7% annual return.");
+        }
+
+        function openCalculator() {
+            alert("Retirement Calculator:\n\n• Contribution Calculator\n• Withdrawal Planner\n• Social Security Estimator\n• 401(k) Optimizer\n\nFeature coming soon!");
+        }
+
+        function switchTab(tab) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+            
+            // Update content based on tab
+            const content = {
+                dashboard: "Dashboard view active",
+                goals: "Goals view - Set and track your retirement milestones",
+                insights: "Insights view - Personalized recommendations and market analysis",
+                profile: "Profile view - Account settings and preferences"
+            };
+            
+            console.log(content[tab]);
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on load
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
